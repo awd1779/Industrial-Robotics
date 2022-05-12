@@ -1,12 +1,76 @@
+% Demonstration of the specified task during an online (in class time) group 
+% presentation (10-15 minutes per group): Path plan between several poses and 
+% the final joint state given a unique and safe environment (developed by each group) 
+% and the simulated model. Use RMRC, collision avoidance and a GUI where appropriate. 
+% Creatively use a real robot that mimics and/or enhances the simulation and application. 
+% Depending upon the robot, marks may be scaled to ignore the hareware portion, 
+% but only if the hardware is inaccessible due to university-approved reasons (e.g. travel restrictions).
+
+% Safety in Demo:
+% (1) xSystem reacts to userxs emergency stop action (minus marks if no estop) 
+% (2) Trajectory reacts to simulated sensor input (e.g. light curtain)
+% (3) Trajectory reacts to a forced simulated upcoming collision
+% (4) Make the robot retreat from a simulated safety symbol using visual servoing and RMRC
+
+% RMRC - Lab 9
+
+
 function [] = main()
     clf
 
+    %% Environment Setup
+    tablePosition = [0 2 0];
+    tablePose = transl(tablePosition);
+    tableMesh_h = PlaceObject('table.ply');
+    tableVertices = get(tableMesh_h,'Vertices');
+    tableTransformedVertices = [tableVertices,ones(size(tableVertices,1),1)] * tablePose';
+    set(tableMesh_h,'Vertices',tableTransformedVertices(:,1:3));
+    camlight;
+    axis equal
+    
+    hold on;
+    
+    basePosition = [-0.11 2 0];
+    basePose = transl(basePosition);
+    baseMesh_h = PlaceObject('dishwasherBottom.ply');
+    baseVertices = get(baseMesh_h,'Vertices');
+    baseTransformedVertices = [baseVertices,ones(size(baseVertices,1),1)] * basePose';
+    set(baseMesh_h,'Vertices',baseTransformedVertices(:,1:3));
+    
+    rackPosition = [-0.13 1.92 1.3];
+    rackPose = transl(rackPosition);
+    rackMesh_h = PlaceObject('dishrack.ply');
+    rackVertices = get(rackMesh_h,'Vertices');
+    rackTransformedVertices = [rackVertices,ones(size(rackVertices,1),1)] * rackPose';
+    set(rackMesh_h,'Vertices',rackTransformedVertices(:,1:3));
+    
+    lidPosition = [-0.11 1.8 1.8];
+    lidPose = transl(lidPosition);
+    lidMesh_h = PlaceObject('toplid.ply');
+    lidVertices = get(lidMesh_h,'Vertices');
+    lidTransformedVertices = [lidVertices,ones(size(lidVertices,1),1)] * lidPose';
+    set(lidMesh_h,'Vertices',lidTransformedVertices(:,1:3));
+    
+%     armPosition = [-0.13 0 1.3];
+%     armPose = transl(armPosition);
+%     armMesh_h = PlaceObject('L_arm1_d.ply');
+%     armVertices = get(armMesh_h,'Vertices');
+%     armTransformedVertices = [armVertices,ones(size(armVertices,1),1)] * armPose';
+%     set(armMesh_h,'Vertices',armTransformedVertices(:,1:3));
+    
+    % Surface environment setup
+    surf([2.5,2.5;2.5,2.5],[-2.5,2.5;-2.5,2.5],[2.5,2.5;0,0],'CData',imread('kitchen2.jpg'),'FaceColor','texturemap');
+    surf([-2.5,-2.5;2.5,2.5],[-2.5,2.5;-2.5,2.5],[0.01,0.01;0.01,0.01],'CData',imread('concrete.jpg'),'FaceColor','texturemap');
+
+
+    %% Logic
     startingPos = zeros(1,6);
     robot = motoman(false);
     workspace = [-2,2,-2,2,0,2];
+
+    robot.model.base = robot.model.base * transl(0,0,1);
     
-    
-    axis equal
+ 
 %     camlight
     robot.model.animate(zeros(1,6));
 %     robot.model.teach
@@ -15,7 +79,6 @@ function [] = main()
 %     robot.model.plot(startingPos,'workspace',workspace,'floorlevel',0,'noarrow', 'scale', 0.8)
 %     robot.model.teach
 %     robot.model.delay = 0;
-    hold on
 %     input('a')
 
     centerpnt = [-0.5,0.5,0.25];
@@ -40,7 +103,7 @@ function [] = main()
 %     steps = 150;
 %     robotTraj = zeros(steps*7,6);
     
-    
+    input("pause")
 %     robotTraj(1:steps*0.5,:) = jtraj(startingPos, pickupDirtyWaypointQ, steps/2);
     robotTraj{1} = getTrajectory(startingPos, pickupDirtyWaypointQ);
 %     robotTraj(steps*0.5+1:steps*1.5,:) = jtraj(pickupDirtyWaypointQ, pickupDirtyQ, steps);
@@ -96,9 +159,9 @@ function [] = main()
                             end
                         else
                             % Randomly pick a pose that is not in collision
-                            qRand = (2 * rand(1,3) - 1) * pi;
+                            qRand = (2 * rand(1,6) - 1) * pi;
                             while IsCollision(robot.model,qRand,faces,vertex,faceNormals)
-                                qRand = (2 * rand(1,3) - 1) * pi;
+                                qRand = (2 * rand(1,6) - 1) * pi;
                             end
                             qWaypoints =[ qWaypoints(1:k,:); qRand; qWaypoints(k+1:end,:)];
                             isCollision = true;
@@ -112,14 +175,13 @@ function [] = main()
             robot.model.animate(robotTraj{i}(j,:))
 
             pause(0.01)
-            if i == steps * 3.5 % placed tray in dish
+            if i == steps * 3.5 % placed tray in dishwasher
                 pause(5)
             end
         end
     end
     
 end
-
 
 %% getTrajectory
 % Gets the quintic trajectory between two joint states
