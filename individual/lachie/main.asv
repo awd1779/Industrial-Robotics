@@ -78,10 +78,7 @@ function [] = main()
 %     input('yo')
     
     robot.model.plot(startingPos,'workspace',workspace,'floorlevel',0,'noarrow', 'scale', 0.8)
-%     robot.model.teach
-%     input('pause')
-
-
+    robot.model.teach
 %     robot.model.delay = 0;
 %     input('a')
 
@@ -121,22 +118,19 @@ function [] = main()
     robotTraj{5} = getTrajectory(washingMachineWaypointQ, washingMachineQ);
 %     robotTraj(steps*3.5+1:steps*4,:) = jtraj(washingMachineQ, washingMachineWaypointQ, steps/2);
     robotTraj{6} = getTrajectory(washingMachineQ, washingMachineWaypointQ);
-    robotTraj{7} = getTrajectory(washingMachineWaypointQ, washingMachineQ);
-    robotTraj{8} = getTrajectory(washingMachineQ, washingMachineWaypointQ);
 %     robotTraj(steps*4+1:steps*4.5,:) = jtraj(washingMachineWaypointQ, dropoffCleanWaypointQ, steps/2);
-    robotTraj{9} = getTrajectory(washingMachineWaypointQ, dropoffCleanWaypointQ);
+    robotTraj{7} = getTrajectory(washingMachineWaypointQ, dropoffCleanWaypointQ);
 %     robotTraj(steps*4.5+1:steps*5.5,:) = jtraj(dropoffCleanWaypointQ, dropoffCleanQ, steps);
-    robotTraj{10} = getTrajectory(dropoffCleanWaypointQ, dropoffCleanQ);
+    robotTraj{8} = getTrajectory(dropoffCleanWaypointQ, dropoffCleanQ);
 %     robotTraj(steps*5.5+1:steps*6,:) = jtraj(dropoffCleanQ, dropoffCleanWaypointQ, steps/2);
-    robotTraj{11} = getTrajectory(dropoffCleanQ, dropoffCleanWaypointQ);
+    robotTraj{9} = getTrajectory(dropoffCleanQ, dropoffCleanWaypointQ);
 %     robotTraj(steps*6+1:steps*7,:) = jtraj(dropoffCleanWaypointQ, startingPos, steps);
-    robotTraj{12} = getTrajectory(dropoffCleanWaypointQ, startingPos);
+    robotTraj{10} = getTrajectory(dropoffCleanWaypointQ, startingPos);
 
-    prevRackLocation = rackPose * trotx(pi/2) * transl(0,0,-0.55);
-    prevLidLocation = lidPose;
+    prevRackLocation = rackPose * trotx(pi/2) * transl(0,0,-0.5);
 
     stop = false;
-    for i = 1 : 12
+    for i = 1 : 10
         steps = size(robotTraj{i});
         for j = 1 : steps(1)
 %             if stop
@@ -182,44 +176,20 @@ function [] = main()
 %                 robot.model.animate(qMatrix)
 %                 return
 %             end
-            if i == 3 || i == 4 || i == 5 || i == 8 || i == 9 || i == 10 
-                tr = (robot.model.fkine(robotTraj{i}(j,:)) / prevRackLocation);
-                vertices = get(rackMesh_h,'Vertices');
-                transformedVertices = [vertices,ones(size(vertices,1),1)] * tr';
-                set(rackMesh_h,'Vertices',transformedVertices(:,1:3));
-                drawnow();
-                prevRackLocation = robot.model.fkine(robotTraj{i}(j,:));
-%                 pause(0.2)
-            end
-
-            if i == 7 && j == 1
-                for k = 1:10
-                    tr = transl(0,0,0.05);
-                    vertices = get(lidMesh_h,'Vertices');
-                    transformedVertices = [vertices,ones(size(vertices,1),1)] * tr';
-                    set(lidMesh_h,'Vertices',transformedVertices(:,1:3));
-                    drawnow();
-                end
-            end
-
+            tr = (robot.model.fkine(robotTraj{i}(j,:)) / prevRackLocation);
+            vertices = get(rackMesh_h,'Vertices');
+            transformedVertices = [vertices,ones(size(vertices,1),1)] * tr';
+            set(rackMesh_h,'Vertices',transformedVertices(:,1:3));
+            drawnow();
+            prevRackLocation = robot.model.fkine(robotTraj{i}(j,:));
             robot.model.animate(robotTraj{i}(j,:))
+
             pause(0.01)
 
-            if i == 6 && j == steps(1)
-                for k = 1:10
-                    tr = transl(0,0,-0.05);
-                    vertices = get(lidMesh_h,'Vertices');
-                    transformedVertices = [vertices,ones(size(vertices,1),1)] * tr';
-                    set(lidMesh_h,'Vertices',transformedVertices(:,1:3));
-                    drawnow();
-                end
-                pause(10)
-            end
-
             
-%             if i == steps * 3.5 % placed tray in dishwasher
-%                 pause(5)
-%             end
+            if i == steps * 3.5 % placed tray in dishwasher
+                pause(5)
+            end
         end
     end
     
