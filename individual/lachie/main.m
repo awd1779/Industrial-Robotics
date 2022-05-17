@@ -269,7 +269,7 @@ function [] = main()
                     set(lidMesh_h,'Vertices',transformedVertices(:,1:3));
                     drawnow();
                 end
-                pause(10)
+                pause(5)
             end
         end
     end
