@@ -81,13 +81,13 @@ function [] = main()
 %     input('a')
 
 %     input("pause")
-    centerpnt = [0,0.7,2];
+    centerpnt = [0.75,0.7,2];
     side = 0.5;
     plotOptions.plotFaces = true;
     [objVertex,objFaces,objFaceNormals,objHandle] = RectangularPrism(centerpnt-side/2, centerpnt+side/2,plotOptions);
 
     % Main poses to pick/dropoff tray
-    pickupDirtyPose = transl(.8,-0.75,1.4)* trotx(pi/2);
+    pickupDirtyPose = transl(0.9, -0.75, 1.35) * trotx(pi/2);
     washingMachine = transl(0,1.4,1.35) * troty(pi/2)*trotx(-pi/2)*trotz(pi/2);
     dropoffCleanPose = transl(-1,-.75,1.4)* trotx(pi/2);
 
@@ -106,12 +106,16 @@ function [] = main()
     %% Building trajectories
     % Normal Speed
     normalTraj{1} = getTrajectory(startingPos, pickupDirtyWaypointQ,4,robot);
-    normalTraj{2} = getTrajectory(pickupDirtyWaypointQ, pickupDirtyQ,3,robot);
+%     normalTraj{2} = getTrajectory(pickupDirtyWaypointQ, pickupDirtyQ,3,robot);
+    normalTraj{2} = getRMRCTrajectory(pickupDirtyWaypointQ, [0.9 -0.75 1.35 pi/2 0 pi/2],4,robot);
+%     normalTraj{3} = getTrajectory(normalTraj{2}(size(normalTraj{2},1),:), pickupDirtyQ,1.5, robot);
     normalTraj{3} = getTrajectory(pickupDirtyQ, pickupDirtyWaypointQ,3,robot);
     normalTraj{4} = getTrajectory(pickupDirtyWaypointQ, washingMachineWaypointQ,6,robot);
     normalTraj{5} = getTrajectory(washingMachineWaypointQ, washingMachineQ,3,robot);
     normalTraj{6} = getTrajectory(washingMachineQ, washingMachineWaypointQ,3,robot);
-    normalTraj{7} = getTrajectory(washingMachineWaypointQ, washingMachineQ,3,robot);
+%     normalTraj{7} = getTrajectory(washingMachineWaypointQ, washingMachineQ,3,robot);
+    normalTraj{7} = getRMRCTrajectory(washingMachineWaypointQ, [0 1.4 1.35 -pi/2 0 -pi],4,robot);
+%     normalTraj{9} = getTrajectory(normalTraj{8}(size(normalTraj{8},1),:), washingMachineQ,1.5, robot);
     normalTraj{8} = getTrajectory(washingMachineQ, washingMachineWaypointQ,3,robot);
     normalTraj{9} = getTrajectory(washingMachineWaypointQ, dropoffCleanWaypointQ,6,robot);
     normalTraj{10} = getTrajectory(dropoffCleanWaypointQ, dropoffCleanQ,3,robot);
@@ -120,18 +124,21 @@ function [] = main()
 
     % Fast Speed
     slowTraj{1} = getTrajectory(startingPos, pickupDirtyWaypointQ,8,robot);
-    slowTraj{2} = getTrajectory(pickupDirtyWaypointQ, pickupDirtyQ,6,robot);
+%     slowTraj{2} = getTrajectory(pickupDirtyWaypointQ, pickupDirtyQ,6,robot);
+    slowTraj{2} = getRMRCTrajectory(pickupDirtyWaypointQ, [0.9 -0.75 1.35 pi/2 0 pi/2],6,robot);
+%     slowTraj{3} = getTrajectory(slowTraj{2}(size(slowTraj{2},1),:), pickupDirtyQ,1.5, robot);
     slowTraj{3} = getTrajectory(pickupDirtyQ, pickupDirtyWaypointQ,6,robot);
     slowTraj{4} = getTrajectory(pickupDirtyWaypointQ, washingMachineWaypointQ,12,robot);
     slowTraj{5} = getTrajectory(washingMachineWaypointQ, washingMachineQ,6,robot);
     slowTraj{6} = getTrajectory(washingMachineQ, washingMachineWaypointQ,6,robot);
-    slowTraj{7} = getTrajectory(washingMachineWaypointQ, washingMachineQ,6,robot);
+%     slowTraj{7} = getTrajectory(washingMachineWaypointQ, washingMachineQ,6,robot);
+    slowTraj{7} = getRMRCTrajectory(washingMachineWaypointQ, [0 1.4 1.35 -pi/2 0 -pi],6,robot);
+%     slowTraj{9} = getTrajectory(slowTraj{8}(size(slowTraj{8},1),:), washingMachineQ,1.5, robot);
     slowTraj{8} = getTrajectory(washingMachineQ, washingMachineWaypointQ,6,robot);
     slowTraj{9} = getTrajectory(washingMachineWaypointQ, dropoffCleanWaypointQ,12,robot);
     slowTraj{10} = getTrajectory(dropoffCleanWaypointQ, dropoffCleanQ,6,robot);
     slowTraj{11} = getTrajectory(dropoffCleanQ, dropoffCleanWaypointQ,6,robot);
     slowTraj{12} = getTrajectory(dropoffCleanWaypointQ, startingPos,10,robot);
-
 
     prevRackLocation = rackPose * trotx(pi/2) * transl(0,0.05,-0.45);
 
@@ -142,10 +149,18 @@ function [] = main()
     robotTraj{1} = slowTraj{1};
 
     for i = 1 : 12
+%         if i == 3
+%             input('check')
+%         end
         success = false;
         
         steps = size(slowTraj{i});
         for x = 1 : size(slowTraj{i},1)
+%             if i == 6 && x == 5
+%                 slow = true;
+%             elseif i == 9 && x == 100
+%                 slow = false;
+%             end
             %% Collision check for 100 steps infront
             j = x;
             if rem(x,2) ~= 0 && ~slow
@@ -180,13 +195,13 @@ function [] = main()
                         % current iteration is outside movement, so check
                         % next movement
                         if (i ~= 12 && IsCollision(robot.model,robotTraj{i+1}(count2,:),objFaces,objVertex,objFaceNormals,false))
-                            input('Collision in path')
+                            disp('Collision in path')
                             [success, prevRackLocation] = avoidance(robot, robotTraj{i+1}, count2,objFaces,objVertex,objFaceNormals,i,rackMesh_h, prevRackLocation);
                             if success
                                 break;
                             else
                                 while(IsCollision(robot.model,robotTraj{i+1}(count2,:),objFaces,objVertex,objFaceNormals,false))
-                                    pause(5);
+                                    pause(2.5);
                                     delete(objHandle)
                                     objFaces = [];
                                     objVertex = [];
@@ -200,13 +215,13 @@ function [] = main()
 
                     else % there is more than 200 steps left in current movement
                         if (IsCollision(robot.model,robotTraj{i}(j+k,:),objFaces,objVertex,objFaceNormals,false))
-                            input('Collision in path')
+                            disp('Collision in path')
                             [success, prevRackLocation] = avoidance(robot, robotTraj{i}, j+k,objFaces,objVertex,objFaceNormals,i,rackMesh_h, prevRackLocation);
                             if success
                                 break;
                             else
                                 while(IsCollision(robot.model,robotTraj{i}(j+k,:),objFaces,objVertex,objFaceNormals,false))
-                                    pause(5);
+                                    pause(2.5);
                                     delete(objHandle)
                                     objFaces = [];
                                     objVertex = [];
@@ -223,7 +238,7 @@ function [] = main()
                 count = 0;
             end
             
-            if i == 3 || i == 4 || i == 5 || i == 8 || i == 9 || i == 10 
+            if i == 3 || i == 4 || i == 5 || i == 8 || i == 9 || i == 10
                 tr = (robot.model.fkine(robotTraj{i}(j,:)) / prevRackLocation);
                 vertices = get(rackMesh_h,'Vertices');
                 transformedVertices = [vertices,ones(size(vertices,1),1)] * tr';
@@ -263,10 +278,7 @@ end
 
 %% getTrajectory
 % Gets the quintic trajectory between two joint states
-function qMatrix = getTrajectory(q1, q2, time, robot)
-
-
-
+function qMatrix = getRMRCTrajectory(q1, goal, time, robot)
     t = time;             % Total time (s)
     deltaT = 0.02;      % Control frequency
     steps = t/deltaT;   % No. of steps for simulation
@@ -282,6 +294,10 @@ function qMatrix = getTrajectory(q1, q2, time, robot)
     x = zeros(3,steps);             % Array for x-y-z trajectory
     positionError = zeros(3,steps); % For plotting trajectory error
     angleError = zeros(3,steps);    % For plotting trajectory error
+
+    x1 = robot.model.fkine(q1);
+    x1 = x1(1:3,4);
+    x2 = goal(1:3)';
     
 %     % 1.3) Set up trajectory, initial pose
 %     s = lspb(0,1,steps);                % Trapezoidal trajectory scalar
@@ -294,48 +310,61 @@ function qMatrix = getTrajectory(q1, q2, time, robot)
 %         theta(3,i) = 0;                 % Yaw angle
 %     end
 
-%     steps = 2;
-%     while ~isempty(find(1 < abs(diff(rad2deg(jtraj(q1,q2,steps)))),1))
-%         steps = steps + 1;
-%     end
-    qMatrix = jtraj(q1,q2,steps);
+    x = zeros(3,steps);
+    s = lspb(0,1,steps);                                 % Create interpolation scalar
+    for i = 1:steps
+        x(:,i) = x1*(1-s(i)) + s(i)*x2;                  % Create trajectory in x-y plane
+        theta(1,i) = goal(4);                 % Roll angle 
+        theta(2,i) = goal(5);            % Pitch angle
+        theta(3,i) = goal(6);
+    end
      
-%     T = [rpy2r(theta(1,1),theta(2,1),theta(3,1)) x(:,1);zeros(1,3) 1];          % Create transformation of first point and angle
-%     q0 = zeros(1,6);                                                            % Initial guess for joint angles
-%     qMatrix(1,:) = q1;                                            % Solve joint angles to achieve first waypoint
+    T = [rpy2r(theta(1,1),theta(2,1),theta(3,1)) x(:,1);zeros(1,3) 1];          % Create transformation of first point and angle
+    q0 = zeros(1,6);                                                            % Initial guess for joint angles
+    qMatrix(1,:) = q1;                                            % Solve joint angles to achieve first waypoint
     
     % 1.4) Track the trajectory with RMRC
-%     for i = 1:steps-1
-%         T = robot.model.fkine(qMatrix(i,:));                                           % Get forward transformation at current joint state
-%         next = robot.model.fkine(qMatrix(i+1,:));
-%         deltaX = next(1:3,4) - T(1:3,4);                                         	% Get position error from next waypoint
-% %         Rd = rpy2r(theta(1,i+1),theta(2,i+1),theta(3,i+1));                     % Get next RPY angles, convert to rotation matrix
-%         Rd = next(1:3,1:3);
-%         Ra = T(1:3,1:3);                                                        % Current end-effector rotation matrix
-%         Rdot = (1/deltaT)*(Rd - Ra);                                                % Calculate rotation matrix error
-%         S = Rdot*Ra';                                                           % Skew symmetric!
-%         linear_velocity = (1/deltaT)*deltaX;
-%         angular_velocity = [S(3,2);S(1,3);S(2,1)];                              % Check the structure of Skew Symmetric matrix!!
-%         xdot = W*[linear_velocity;angular_velocity];                          	% Calculate end-effector velocity to reach next waypoint.
-%         J = robot.model.jacob0(qMatrix(i,:));                 % Get Jacobian at current joint state
-%         m(i) = sqrt(det(J*J'));
-%         if m(i) < epsilon  % If manipulability is less than given threshold
-%             lambda = (1 - m(i)/epsilon)*5E-2;
-%         else
-%             lambda = 0;
-%         end
-%         invJ = inv(J'*J + lambda *eye(6))*J';                                   % DLS Inverse
-%         qdot(i,:) = (invJ*xdot)';                                                % Solve the RMRC equation (you may need to transpose the         vector)
-%         for j = 1:6                                                             % Loop through joints 1 to 6
-%             if qMatrix(i,j) + deltaT*qdot(i,j) < robot.model.qlim(j,1)                     % If next joint angle is lower than joint limit...
-%                 qdot(i,j) = 0; % Stop the motor
-%             elseif qMatrix(i,j) + deltaT*qdot(i,j) > robot.model.qlim(j,2)                 % If next joint angle is greater than joint limit ...
-%                 qdot(i,j) = 0; % Stop the motor
-%             end
-%         end
-%         qMatrix(i+1,:) = qMatrix(i,:) + deltaT*qdot(i,:);                         	% Update next joint state based on joint velocities
-%     end
+    for i = 1:steps-1
+        T = robot.model.fkine(qMatrix(i,:));                                           % Get forward transformation at current joint state
+        deltaX = x(:,i+1) - T(1:3,4);                                         	% Get position error from next waypoint
+        Rd = rpy2r(theta(1,i+1),theta(2,i+1),theta(3,i+1));                     % Get next RPY angles, convert to rotation matrix
+        Ra = T(1:3,1:3);                                                        % Current end-effector rotation matrix
+        Rdot = (1/deltaT)*(Rd - Ra);                                                % Calculate rotation matrix error
+        S = Rdot*Ra';                                                           % Skew symmetric!
+        linear_velocity = (1/deltaT)*deltaX;
+        angular_velocity = [S(3,2);S(1,3);S(2,1)];                              % Check the structure of Skew Symmetric matrix!!
+        deltaTheta = tr2rpy(Rd*Ra');                                            % Convert rotation matrix to RPY angles
+        xdot = W*[linear_velocity;angular_velocity];                          	% Calculate end-effector velocity to reach next waypoint.
+        J = robot.model.jacob0(qMatrix(i,:));                 % Get Jacobian at current joint state
+        m(i) = sqrt(det(J*J'));
+        if m(i) < epsilon  % If manipulability is less than given threshold
+            lambda = (1 - m(i)/epsilon)*5E-2;
+        else
+            lambda = 0;
+        end
+        invJ = inv(J'*J + lambda *eye(6))*J';                                   % DLS Inverse
+        qdot(i,:) = (invJ*xdot)';                                                % Solve the RMRC equation (you may need to transpose the         vector)
+        for j = 1:6                                                             % Loop through joints 1 to 6
+            if qMatrix(i,j) + deltaT*qdot(i,j) < robot.model.qlim(j,1)                     % If next joint angle is lower than joint limit...
+                qdot(i,j) = 0; % Stop the motor
+            elseif qMatrix(i,j) + deltaT*qdot(i,j) > robot.model.qlim(j,2)                 % If next joint angle is greater than joint limit ...
+                qdot(i,j) = 0; % Stop the motor
+            end
+        end
+        qMatrix(i+1,:) = qMatrix(i,:) + deltaT*qdot(i,:);                         	% Update next joint state based on joint velocities
+        positionError(:,i) = x(:,i+1) - T(1:3,4);                               % For plotting
+        angleError(:,i) = deltaTheta;                                           % For plotting
+    end
 
+end
+
+
+function qMatrix = getTrajectory(q1, q2, time, robot)
+    t = time;             % Total time (s)
+    deltaT = 0.02;      % Control frequency
+    steps = t/deltaT;
+
+    qMatrix = jtraj(q1,q2,steps);
 end
 
 
@@ -374,7 +403,7 @@ function [success, prevRackLocation] = avoidance(robot, robotTraj, count2,objFac
         success = false;
     else
         for l = 1 : 300
-            if i == 3 || i == 4 || i == 5 || i == 8 || i == 9 || i == 10 
+            if i == 3 || i == 4 || i == 5 || i == 8 || i == 9 || i == 10
                 tr = (robot.model.fkine(newTraj1(l,:)) / prevRackLocation);
                 vertices = get(rackMesh_h,'Vertices');
                 transformedVertices = [vertices,ones(size(vertices,1),1)] * tr';
@@ -387,7 +416,7 @@ function [success, prevRackLocation] = avoidance(robot, robotTraj, count2,objFac
             pause(0.01);
         end
         for l = 1 : 300
-            if i == 3 || i == 4 || i == 5 || i == 8 || i == 9 || i == 10 
+            if i == 3 || i == 4 || i == 5 || i == 8 || i == 9 || i == 10
                 tr = (robot.model.fkine(newTraj2(l,:)) / prevRackLocation);
                 vertices = get(rackMesh_h,'Vertices');
                 transformedVertices = [vertices,ones(size(vertices,1),1)] * tr';
