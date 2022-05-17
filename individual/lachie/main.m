@@ -161,10 +161,14 @@ function [] = main()
             
             if slow
                 robotTraj{i} = slowTraj{i};
-                robotTraj{i+1} = slowTraj{i+1};
+                if i ~= 12
+                    robotTraj{i+1} = slowTraj{i+1};
+                end
             else
                 robotTraj{i} = normalTraj{i};
-                robotTraj{i+1} = normalTraj{i+1};
+                if i ~= 12
+                    robotTraj{i+1} = normalTraj{i+1};
+                end
             end
             
             % Every 20 steps, check the next 200 steps
@@ -229,7 +233,7 @@ function [] = main()
 %                 pause(0.2)
             end
 
-            if i == 7 && j == 1
+            if i == 7 && x == 2
                 for k = 1:20
                     tr = transl(0,0,0.035);
                     vertices = get(lidMesh_h,'Vertices');
@@ -242,7 +246,7 @@ function [] = main()
             robot.model.animate(robotTraj{i}(j,:))
             pause(0.01)
 
-            if i == 6 && j == steps(1)
+            if i == 6 && x == steps(1)
                 for k = 1:20
                     tr = transl(0,0,-0.035);
                     vertices = get(lidMesh_h,'Vertices');
