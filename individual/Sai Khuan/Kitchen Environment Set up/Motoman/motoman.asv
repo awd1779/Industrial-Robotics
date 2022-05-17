@@ -39,7 +39,7 @@ L3 = Link('d',0,'a',0,'alpha',pi/2,'offset',0,'qlim',[deg2rad(-170),deg2rad(170)
 
 L4 = Link('d',0.5,'a',0,'alpha',pi/2,'offset',0,'qlim',[deg2rad(-360),deg2rad(360)]);
 
-L5 = Link('d',0.162,'a',-0.01,'alpha',-pi/2,'offset',0,'qlim',[deg2rad(-360),deg2rad(360)]); %initial a=0
+L5 = Link('d',0.162,'a',-0.001,'alpha',-pi/2,'offset',0,'qlim',[deg2rad(-360),deg2rad(360)]); 
 
 L6 = Link('d',0.170,'a',0,'alpha',0,'offset',0,'qlim',[deg2rad(-360),deg2rad(360)]);
         
