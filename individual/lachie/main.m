@@ -19,45 +19,95 @@ function [] = main()
     clf
 
     %% Environment Setup
-    tablePosition = [-0.2 -1.15 0];
-    tablePose = transl(tablePosition) * trotz(pi);
-    tableMesh_h = PlaceObject('table.ply');
-    tableVertices = get(tableMesh_h,'Vertices');
+    hold on;
+    tablePosition = [-0.75,-1.15,0; 0,0,0; 0.8,-1.15,0];
+    tableMesh_h = PlaceObject('newTable.ply', tablePosition);
+
+%     ; -1.5,0.5,0; -1.5,-0.5,0
+
+    tableVertices = get(tableMesh_h(2),'Vertices');
+    tableTransformedVertices = [tableVertices,ones(size(tableVertices,1),1)] * trotz(pi/2)';
+    set(tableMesh_h(2),'Vertices',tableTransformedVertices(:,1:3));
+
+    tableMesh_h(4) = PlaceObject('newTable.ply');
+    tablePose = transl(-1.2,1,0) * trotz(pi/2);
+    tableVertices = get(tableMesh_h(4),'Vertices');
     tableTransformedVertices = [tableVertices,ones(size(tableVertices,1),1)] * tablePose';
-    set(tableMesh_h,'Vertices',tableTransformedVertices(:,1:3));
+    set(tableMesh_h(4),'Vertices',tableTransformedVertices(:,1:3));
+
+    tableMesh_h(5) = PlaceObject('newTable.ply');
+    tablePose = transl(-1.2,-0.2,0) * trotz(pi/2);
+    tableVertices = get(tableMesh_h(5),'Vertices');
+    tableTransformedVertices = [tableVertices,ones(size(tableVertices,1),1)] * tablePose';
+    set(tableMesh_h(5),'Vertices',tableTransformedVertices(:,1:3));
+
+    
+%     tablePose = transl(tablePosition) * trotz(pi);
+    
+%     tableVertices = get(tableMesh_h,'Vertices');
+%     tableTransformedVertices = [tableVertices,ones(size(tableVertices,1),1)] * tablePose';
+%     set(tableMesh_h,'Vertices',tableTransformedVertices(:,1:3));
     
     axis equal
     
     hold on;
     camlight;
     
-    basePosition = [0 1.8 0];
+    basePosition = [0 1.7 0];
     basePose = transl(basePosition);
-    baseMesh_h = PlaceObject('dishwasherBottom.ply');
+    baseMesh_h = PlaceObject('dishwasherBottom_d.ply');
     baseVertices = get(baseMesh_h,'Vertices');
     baseTransformedVertices = [baseVertices,ones(size(baseVertices,1),1)] * basePose';
     set(baseMesh_h,'Vertices',baseTransformedVertices(:,1:3));
     
-    rackPosition = [0.9 -1.2 1.3];
+    rackPosition = [0.9 -1.2 1];
     rackPose = transl(rackPosition);
-    rackMesh_h = PlaceObject('dishrack.ply');
+    rackMesh_h = PlaceObject('dishTray.ply');
     rackVertices = get(rackMesh_h,'Vertices');
     rackTransformedVertices = [rackVertices,ones(size(rackVertices,1),1)] * rackPose';
     set(rackMesh_h,'Vertices',rackTransformedVertices(:,1:3));
     
-    lidPosition = [0 1.6 2];
+    lidPosition = [0 1.5 1.7];
     lidPose = transl(lidPosition);
-    lidMesh_h = PlaceObject('toplid.ply');
+    lidMesh_h = PlaceObject('toplid_d.ply');
     lidVertices = get(lidMesh_h,'Vertices');
     lidTransformedVertices = [lidVertices,ones(size(lidVertices,1),1)] * lidPose';
     set(lidMesh_h,'Vertices',lidTransformedVertices(:,1:3));
+
+    firstAidPosition = [2.38 0 1.1];
+    firstAidPose = transl(firstAidPosition) * trotz(-pi/2);
+    firstAidMesh_h = PlaceObject('firstAid.ply');
+    firstAidVertices = get(firstAidMesh_h,'Vertices');
+    firstAidTransformedVertices = [firstAidVertices,ones(size(firstAidVertices,1),1)] * firstAidPose';
+    set(firstAidMesh_h,'Vertices',firstAidTransformedVertices(:,1:3));
+
+    fireExtPosition = [2.4 0 0];
+    fireExtPose = transl(fireExtPosition)  * trotz(pi/2) ;
+    fireExtMesh_h = PlaceObject('fireExtinguisher.ply');
+    fireExtVertices = get(fireExtMesh_h,'Vertices');
+    fireExtTransformedVertices = [fireExtVertices,ones(size(fireExtVertices,1),1)] * fireExtPose';
+    set(fireExtMesh_h,'Vertices',fireExtTransformedVertices(:,1:3));
+
+    eStopPosition = [0.35 -1.4 0.95];
+    eStopPose = transl(eStopPosition);
+    eStopMesh_h = PlaceObject('eStop.ply');
+    eStopVertices = get(eStopMesh_h,'Vertices');
+    eStopTransformedVertices = [eStopVertices,ones(size(eStopVertices,1),1)] * eStopPose';
+    set(eStopMesh_h,'Vertices',eStopTransformedVertices(:,1:3));
+
+    fencePosition = [0 2.2 0];
+    fencePose = transl(fencePosition);
+    fenceMesh_h = PlaceObject('fence.ply');
+    fenceVertices = get(fenceMesh_h,'Vertices');
+    fenceTransformedVertices = [fenceVertices,ones(size(fenceVertices,1),1)] * fencePose';
+    set(fenceMesh_h,'Vertices',fenceTransformedVertices(:,1:3));
     
-%     armPosition = [-0.13 0 1.3];
-%     armPose = transl(armPosition);
-%     armMesh_h = PlaceObject('L_arm1_d.ply');
-%     armVertices = get(armMesh_h,'Vertices');
-%     armTransformedVertices = [armVertices,ones(size(armVertices,1),1)] * armPose';
-%     set(armMesh_h,'Vertices',armTransformedVertices(:,1:3));
+    fence2Position = [-2 0 0];
+    fence2Pose = transl(fence2Position)  * trotz(pi/2) ;
+    fence2Mesh_h = PlaceObject('fence.ply');
+    fence2Vertices = get(fence2Mesh_h,'Vertices');
+    fence2TransformedVertices = [fence2Vertices,ones(size(fence2Vertices,1),1)] * fence2Pose';
+    set(fence2Mesh_h,'Vertices',fence2TransformedVertices(:,1:3));
     
     % Surface environment setup
     surf([2.5,2.5;2.5,2.5],[-2.5,2.5;-2.5,2.5],[2.5,2.5;0,0],'CData',imread('kitchen2.jpg'),'FaceColor','texturemap');
@@ -69,78 +119,78 @@ function [] = main()
     robot = motoman(false);
     workspace = [-2,2,-2,2,0,2];
 
-    robot.model.base = robot.model.base * transl(0,0,1);
+    robot.model.base = robot.model.base * transl(0,0,0.9);
     robot.model.animate(startingPos);
+    xlim([-2.5 2.5]) 
+    ylim([-2.5 2.5])
+    zlim([0 2.5])
     
 %     robot.model.plot(startingPos,'workspace',workspace,'floorlevel',0,'noarrow', 'scale', 0.4)
 %     robot.model.teach
     input('pause')
-
-
-%     robot.model.delay = 0;
-%     input('a')
-
-%     input("pause")
-    centerpnt = [0.75,0.7,2];
+    
+%     centerpnt = [0.75,0.7,2];
+%     centerpnt = [0.75,0.7,1.7];
+    centerpnt = [0,0.7,1.7];
     side = 0.5;
     plotOptions.plotFaces = true;
     [objVertex,objFaces,objFaceNormals,objHandle] = RectangularPrism(centerpnt-side/2, centerpnt+side/2,plotOptions);
 
     % Main poses to pick/dropoff tray
-    pickupDirtyPose = transl(0.9, -0.75, 1.35) * trotx(pi/2);
-    washingMachine = transl(0,1.4,1.35) * troty(pi/2)*trotx(-pi/2)*trotz(pi/2);
-    dropoffCleanPose = transl(-1,-.75,1.4)* trotx(pi/2);
+    pickupDirtyPose = transl(0.9, -0.9, 1.05) * trotx(pi/2);
+    washingMachine = transl(0,1.55,1.15) * troty(pi/2)*trotx(-pi/2)*trotz(pi/2);
+    dropoffCleanPose = transl(-1,-.9,1.02)* trotx(pi/2);
 
     % Estimate joint angles
     elbowDownDishwasher = [pi/2, -pi/4, pi/4, -pi/2, 0, 0];
     elbowDownDrier = [-pi/2, -pi/4, pi/4, -pi/2, 0, 0];
     
     % Setting robot joint angle waypoints to move through
-    pickupDirtyWaypointQ = robot.model.ikcon(pickupDirtyPose * transl(0,0.4,-0.3),elbowDownDrier);
+    pickupDirtyWaypointQ = robot.model.ikcon(pickupDirtyPose * transl(0,0.3,-0.3),elbowDownDrier);
     pickupDirtyQ = robot.model.ikcon(pickupDirtyPose, elbowDownDrier);
     washingMachineWaypointQ = robot.model.ikcon(washingMachine * transl(0,0.2,-0.7), elbowDownDishwasher);
     washingMachineQ = robot.model.ikcon(washingMachine, elbowDownDishwasher);
-    dropoffCleanWaypointQ = robot.model.ikcon(dropoffCleanPose * transl(0,0.4,-0.3), elbowDownDrier);
+    dropoffCleanWaypointQ = robot.model.ikcon(dropoffCleanPose * transl(0,0.3,-0.3), elbowDownDrier);
     dropoffCleanQ = robot.model.ikcon(dropoffCleanPose, elbowDownDrier);
 
     %% Building trajectories
     % Normal Speed
     normalTraj{1} = getTrajectory(startingPos, pickupDirtyWaypointQ,4,robot);
 %     normalTraj{2} = getTrajectory(pickupDirtyWaypointQ, pickupDirtyQ,3,robot);
-    normalTraj{2} = getRMRCTrajectory(pickupDirtyWaypointQ, [0.9 -0.75 1.35 pi/2 0 pi/2],4,robot);
+    normalTraj{2} = getRMRCTrajectory(pickupDirtyWaypointQ, [0.9 -0.9 1.05 pi/2 0 pi/2],3,robot);
 %     normalTraj{3} = getTrajectory(normalTraj{2}(size(normalTraj{2},1),:), pickupDirtyQ,1.5, robot);
     normalTraj{3} = getTrajectory(pickupDirtyQ, pickupDirtyWaypointQ,3,robot);
-    normalTraj{4} = getTrajectory(pickupDirtyWaypointQ, washingMachineWaypointQ,6,robot);
+    normalTraj{4} = getTrajectory(pickupDirtyWaypointQ, washingMachineWaypointQ,5,robot);
     normalTraj{5} = getTrajectory(washingMachineWaypointQ, washingMachineQ,3,robot);
     normalTraj{6} = getTrajectory(washingMachineQ, washingMachineWaypointQ,3,robot);
 %     normalTraj{7} = getTrajectory(washingMachineWaypointQ, washingMachineQ,3,robot);
-    normalTraj{7} = getRMRCTrajectory(washingMachineWaypointQ, [0 1.4 1.35 -pi/2 0 -pi],4,robot);
+    normalTraj{7} = getRMRCTrajectory(washingMachineWaypointQ, [0 1.55 1.15 -pi/2 0 -pi],3,robot);
 %     normalTraj{9} = getTrajectory(normalTraj{8}(size(normalTraj{8},1),:), washingMachineQ,1.5, robot);
     normalTraj{8} = getTrajectory(washingMachineQ, washingMachineWaypointQ,3,robot);
-    normalTraj{9} = getTrajectory(washingMachineWaypointQ, dropoffCleanWaypointQ,6,robot);
+    normalTraj{9} = getTrajectory(washingMachineWaypointQ, dropoffCleanWaypointQ,5,robot);
     normalTraj{10} = getTrajectory(dropoffCleanWaypointQ, dropoffCleanQ,3,robot);
     normalTraj{11} = getTrajectory(dropoffCleanQ, dropoffCleanWaypointQ,3,robot);
-    normalTraj{12} = getTrajectory(dropoffCleanWaypointQ, startingPos,5,robot);
+    normalTraj{12} = getTrajectory(dropoffCleanWaypointQ, startingPos,4,robot);
 
-    % Fast Speed
+    % Slow Speed
     slowTraj{1} = getTrajectory(startingPos, pickupDirtyWaypointQ,8,robot);
 %     slowTraj{2} = getTrajectory(pickupDirtyWaypointQ, pickupDirtyQ,6,robot);
-    slowTraj{2} = getRMRCTrajectory(pickupDirtyWaypointQ, [0.9 -0.75 1.35 pi/2 0 pi/2],6,robot);
+    slowTraj{2} = getRMRCTrajectory(pickupDirtyWaypointQ, [0.9 -0.9 1.05 pi/2 0 pi/2],6,robot);
 %     slowTraj{3} = getTrajectory(slowTraj{2}(size(slowTraj{2},1),:), pickupDirtyQ,1.5, robot);
     slowTraj{3} = getTrajectory(pickupDirtyQ, pickupDirtyWaypointQ,6,robot);
-    slowTraj{4} = getTrajectory(pickupDirtyWaypointQ, washingMachineWaypointQ,12,robot);
+    slowTraj{4} = getTrajectory(pickupDirtyWaypointQ, washingMachineWaypointQ,10,robot);
     slowTraj{5} = getTrajectory(washingMachineWaypointQ, washingMachineQ,6,robot);
     slowTraj{6} = getTrajectory(washingMachineQ, washingMachineWaypointQ,6,robot);
 %     slowTraj{7} = getTrajectory(washingMachineWaypointQ, washingMachineQ,6,robot);
-    slowTraj{7} = getRMRCTrajectory(washingMachineWaypointQ, [0 1.4 1.35 -pi/2 0 -pi],6,robot);
+    slowTraj{7} = getRMRCTrajectory(washingMachineWaypointQ, [0 1.55 1.15 -pi/2 0 -pi],6,robot);
 %     slowTraj{9} = getTrajectory(slowTraj{8}(size(slowTraj{8},1),:), washingMachineQ,1.5, robot);
     slowTraj{8} = getTrajectory(washingMachineQ, washingMachineWaypointQ,6,robot);
-    slowTraj{9} = getTrajectory(washingMachineWaypointQ, dropoffCleanWaypointQ,12,robot);
+    slowTraj{9} = getTrajectory(washingMachineWaypointQ, dropoffCleanWaypointQ,10,robot);
     slowTraj{10} = getTrajectory(dropoffCleanWaypointQ, dropoffCleanQ,6,robot);
     slowTraj{11} = getTrajectory(dropoffCleanQ, dropoffCleanWaypointQ,6,robot);
-    slowTraj{12} = getTrajectory(dropoffCleanWaypointQ, startingPos,10,robot);
+    slowTraj{12} = getTrajectory(dropoffCleanWaypointQ, startingPos,8,robot);
 
-    prevRackLocation = rackPose * trotx(pi/2) * transl(0,0.05,-0.45);
+    prevRackLocation = rackPose * trotx(pi/2) * transl(0,0.05,-0.3);
 
     % Animation and logic
     stop = false;
@@ -250,7 +300,7 @@ function [] = main()
 
             if i == 7 && x == 2
                 for k = 1:20
-                    tr = transl(0,0,0.035);
+                    tr = transl(0,0,0.03);
                     vertices = get(lidMesh_h,'Vertices');
                     transformedVertices = [vertices,ones(size(vertices,1),1)] * tr';
                     set(lidMesh_h,'Vertices',transformedVertices(:,1:3));
@@ -263,7 +313,7 @@ function [] = main()
 
             if i == 6 && x == steps(1)
                 for k = 1:20
-                    tr = transl(0,0,-0.035);
+                    tr = transl(0,0,-0.03);
                     vertices = get(lidMesh_h,'Vertices');
                     transformedVertices = [vertices,ones(size(vertices,1),1)] * tr';
                     set(lidMesh_h,'Vertices',transformedVertices(:,1:3));
@@ -298,17 +348,6 @@ function qMatrix = getRMRCTrajectory(q1, goal, time, robot)
     x1 = robot.model.fkine(q1);
     x1 = x1(1:3,4);
     x2 = goal(1:3)';
-    
-%     % 1.3) Set up trajectory, initial pose
-%     s = lspb(0,1,steps);                % Trapezoidal trajectory scalar
-%     for i=1:steps
-%         x(1,i) = (1-s(i))*0.35 + s(i)*0.35; % Points in x
-%         x(2,i) = (1-s(i))*-0.55 + s(i)*0.55; % Points in y
-%         x(3,i) = 0.5 + 0.2*sin(i*delta); % Points in z
-%         theta(1,i) = 0;                 % Roll angle 
-%         theta(2,i) = 5*pi/9;            % Pitch angle
-%         theta(3,i) = 0;                 % Yaw angle
-%     end
 
     x = zeros(3,steps);
     s = lspb(0,1,steps);                                 % Create interpolation scalar
